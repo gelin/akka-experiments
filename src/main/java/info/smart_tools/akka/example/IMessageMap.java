@@ -6,7 +6,8 @@ public interface IMessageMap {
 
     /**
      *  Returns next actor in the chain.
+     *  @param current current actor processing the chain
      */
-    ActorRef next();
+    ActorRef next(ActorRef current);
 
 }

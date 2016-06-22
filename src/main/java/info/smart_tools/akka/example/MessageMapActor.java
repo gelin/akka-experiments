@@ -8,7 +8,8 @@ import akka.event.LoggingAdapter;
 import akka.japi.Creator;
 
 /**
- * Created by gelin on 6/6/16.
+ *  Simple message map actor.
+ *  Works like a router to pass a message returned by the actor from the map to the next actor in the map.
  */
 public class MessageMapActor extends UntypedActor {
 
@@ -23,6 +24,7 @@ public class MessageMapActor extends UntypedActor {
 
     LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final IMessageMap messageMap;
+    private ActorRef initialSender = null;
 
     public MessageMapActor(IMessageMap messageMap) {
         this.messageMap = messageMap;
@@ -30,11 +32,15 @@ public class MessageMapActor extends UntypedActor {
     }
 
     public void onReceive(Object message) throws Exception {
-        ActorRef next = messageMap.next();
+        if (initialSender == null) {
+            initialSender = getSender();
+        }
+        ActorRef next = messageMap.next(getSender());
         if (null != next) {
             next.tell(message, getSelf());
         } else {
-            getContext().stop(getSelf());
+            initialSender.tell(message, getSelf());
+            initialSender = null;
         }
     }
 

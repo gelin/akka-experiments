@@ -17,9 +17,12 @@ public class Main {
         targets.add(system.actorOf(SampleActor.props("Third"), "third"));
         IMessageMap messageMap = new StraightMessageMap(targets);
 
+        ActorRef logActor = system.actorOf(LogActor.props("Logger"), "logger");
+
         ActorRef map = system.actorOf(MessageMapActor.props(messageMap), "messageMap");
         IText initialMessage = new SampleMessage("initial");
-        map.tell(initialMessage, ActorRef.noSender());
+        map.tell(initialMessage, logActor); // run once
+//        map.tell(initialMessage, logActor); // run second
     }
 
 }

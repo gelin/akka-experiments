@@ -6,13 +6,13 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
 
-public class SampleActor extends UntypedActor {
+public class LogActor extends UntypedActor {
 
     public static Props props(final String name) {
-        return Props.create(new Creator<SampleActor>() {
+        return Props.create(new Creator<LogActor>() {
             @Override
-            public SampleActor create() throws Exception {
-                return new SampleActor(name);
+            public LogActor create() throws Exception {
+                return new LogActor(name);
             }
         });
     }
@@ -20,19 +20,12 @@ public class SampleActor extends UntypedActor {
     LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final String name;
 
-    public SampleActor(String name) {
+    public LogActor(String name) {
         this.name = name;
     }
 
     public void onReceive(Object message) throws Exception {
         log.info(name + " received\n" + message);
-        if (message instanceof IText) {
-            IText text = (IText) message;
-            IText reply = text.setText(text.getText() + "\nprocessed by " + name);
-            getSender().tell(reply, getSelf());
-        } else {
-            unhandled(message);
-        }
     }
 
 }
