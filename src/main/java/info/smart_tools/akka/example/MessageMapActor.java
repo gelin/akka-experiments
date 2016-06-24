@@ -13,34 +13,32 @@ import akka.japi.Creator;
  */
 public class MessageMapActor extends UntypedActor {
 
-    public static Props props(final IMessageMap messageMap) {
+    public static Props props(final IMessageMap messageMap, final ActorRef replyTo) {
         return Props.create(new Creator<MessageMapActor>() {
             @Override
             public MessageMapActor create() throws Exception {
-                return new MessageMapActor(messageMap);
+                return new MessageMapActor(messageMap, replyTo);
             }
         });
     }
 
     LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-    private final IMessageMap messageMap;
-    private ActorRef initialSender = null;
 
-    public MessageMapActor(IMessageMap messageMap) {
+    private final IMessageMap messageMap;
+    private final ActorRef replyTo;
+
+    public MessageMapActor(final IMessageMap messageMap, final ActorRef replyTo) {
         this.messageMap = messageMap;
+        this.replyTo = replyTo;
         //TODO: how to put the message map into the message?
     }
 
     public void onReceive(Object message) throws Exception {
-        if (initialSender == null) {
-            initialSender = getSender();
-        }
         ActorRef next = messageMap.next(getSender());
         if (null != next) {
             next.tell(message, getSelf());
         } else {
-            initialSender.tell(message, getSelf());
-            initialSender = null;
+            replyTo.tell(message, getSelf());
         }
     }
 

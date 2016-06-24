@@ -19,10 +19,10 @@ public class Main {
 
         ActorRef logActor = system.actorOf(LogActor.props("Logger"), "logger");
 
-        ActorRef map = system.actorOf(MessageMapActor.props(messageMap), "messageMap");
+        ActorRef map = system.actorOf(MessageMapActor.props(messageMap, logActor), "messageMap");
         IText initialMessage = new SampleMessage("initial");
         map.tell(initialMessage, logActor); // run once
-//        map.tell(initialMessage, logActor); // run second
+        map.tell(initialMessage, logActor); // run second
     }
 
 }
